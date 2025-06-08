@@ -25,7 +25,7 @@ export async function fetchNotes(
   search: string = "",
   page: number = 1
 ): Promise<FetchNotesResponse> {
-  const params: FetchNotesParams = { page, perPage: 10 };
+  const params: FetchNotesParams = { page, perPage: 12 };
   if (search.trim()) params.search = search.trim();
 
   const response = await axiosInstance.get<FetchNotesResponse>("/notes", {
