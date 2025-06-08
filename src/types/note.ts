@@ -4,7 +4,7 @@ export interface Note {
   content: string;
   createdAt: string;
   updatedAt: string;
-  tag?: string;
+  tag: string; 
 }
 
 export interface NewNote {
@@ -13,4 +13,4 @@ export interface NewNote {
   tag: Tag;
 }
 
-export type Tag = "Work" | "Personal" | "Meeting" | "Shooping" | "Todo";
+export type Tag = "Work" | "Personal" | "Meeting" | "Shopping" | "Todo";

@@ -8,10 +8,8 @@ import Pagination from "../Pagination/Pagination";
 import NoteModal from "../NoteModal/NoteModal";
 import NoteForm from "../NoteForm/NoteForm";
 import { useDebounce } from "use-debounce";
-import  ErrorMessage  from "../ErrorOverlay/ErrorMessage";
-import  Loader  from '../LoaderOverlay/Loader'
-
-
+import ErrorMessage from "../ErrorOverlay/ErrorMessage";
+import Loader from "../LoaderOverlay/Loader";
 
 export default function App() {
   const [inputValue, setInputValue] = useState<string>("");
@@ -28,6 +26,11 @@ export default function App() {
 
   const totalPages = notes.data?.totalPages ?? 0;
 
+  const handleSearch = (value: string) => {
+    setInputValue(value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className={css.app}>
       {notes.isLoading && (
@@ -37,7 +40,7 @@ export default function App() {
       )}
 
       <header className={css.toolbar}>
-        <SearchBox value={inputValue} onSearch={setInputValue} />
+        <SearchBox value={inputValue} onSearch={handleSearch} />
         {totalPages > 0 && (
           <Pagination
             totalPages={totalPages}
@@ -54,7 +57,7 @@ export default function App() {
 
       {notes.isError && (
         <div className={css.errorOverlay}>
-          <ErrorMessage/>
+          <ErrorMessage />
         </div>
       )}
 

@@ -1,11 +1,11 @@
 import css from "./SearchBox.module.css";
 
-interface SefrchBoxProps {
+interface SearchBoxProps {
   onSearch: (value: string) => void;
   value: string;
 }
 
-export default function SearchBox({ value, onSearch }: SefrchBoxProps) {
+export default function SearchBox({ value, onSearch }: SearchBoxProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSearch(e.target.value);
   };
