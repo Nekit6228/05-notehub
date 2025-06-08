@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import css from "./App.module.css";
+import SearchBox from "../SearchBox/SearchBox";
+import NoteList from "../NoteList/NoteList";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { fetchNotes } from "../../services/noteService";
+import Pagination from "../Pagination/Pagination";
+import NoteModal from "../NoteModal/NoteModal";
+import NoteForm from "../NoteForm/NoteForm";
+import { useDebounce } from "use-debounce";
+import  ErrorMessage  from "../ErrorOverlay/ErrorMessage";
+import  Loader  from '../LoaderOverlay/Loader'
 
-function App() {
-  const [count, setCount] = useState(0)
+
+
+export default function App() {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [debouncedInputValue] = useDebounce(inputValue, 500);
+
+  const notes = useQuery({
+    queryKey: ["notes", debouncedInputValue, currentPage],
+    queryFn: () => fetchNotes(debouncedInputValue, currentPage),
+    placeholderData: keepPreviousData,
+  });
+
+  const totalPages = notes.data?.totalPages ?? 0;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className={css.app}>
+      {notes.isLoading && (
+        <div className={css.loaderOverlay}>
+          <Loader />
+        </div>
+      )}
 
-export default App
+      <header className={css.toolbar}>
+        <SearchBox value={inputValue} onSearch={setInputValue} />
+        {totalPages > 0 && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
+        )}
+        <button onClick={() => setIsModalOpen(true)} className={css.button}>
+          Create note +
+        </button>
+      </header>
+
+      <NoteList notes={notes.data?.notes ?? []} />
+
+      {notes.isError && (
+        <div className={css.errorOverlay}>
+          <ErrorMessage/>
+        </div>
+      )}
+
+      {isModalOpen && (
+        <NoteModal onClose={() => setIsModalOpen(false)}>
+          <NoteForm onClose={() => setIsModalOpen(false)} />
+        </NoteModal>
+      )}
+    </div>
+  );
+}
